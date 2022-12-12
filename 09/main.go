@@ -77,16 +77,16 @@ func (tail *coordinates) follow(lead coordinates) {
 
 	if tail.x-lead.x == 2 {
 		tail.x--
-		tail.ajustY(lead)
+		tail.adjustY(lead)
 	} else if tail.x-lead.x == -2 {
 		tail.x++
-		tail.ajustY(lead)
+		tail.adjustY(lead)
 	} else if tail.y-lead.y == 2 {
 		tail.y--
-		tail.ajustX(lead)
+		tail.adjustX(lead)
 	} else if tail.y-lead.y == -2 {
 		tail.y++
-		tail.ajustX(lead)
+		tail.adjustX(lead)
 	}
 }
 
@@ -104,7 +104,7 @@ func (tail *coordinates) around(lead coordinates) bool {
 	return false
 }
 
-func (tail *coordinates) ajustX(lead coordinates) {
+func (tail *coordinates) adjustX(lead coordinates) {
 	if lead.x > tail.x {
 		tail.x++
 	} else if lead.x < tail.x {
@@ -112,7 +112,7 @@ func (tail *coordinates) ajustX(lead coordinates) {
 	}
 }
 
-func (tail *coordinates) ajustY(lead coordinates) {
+func (tail *coordinates) adjustY(lead coordinates) {
 	if lead.y > tail.y {
 		tail.y++
 	} else if lead.y < tail.y {
