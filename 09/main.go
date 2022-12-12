@@ -13,76 +13,109 @@ type coordinates struct {
 }
 
 func main() {
-	file, err := os.Open("./input.txt")
-	if err != nil {
-		panic(err)
-	}
-
+	file, _ := os.Open("./input.txt")
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	hCoord := coordinates{x: 0, y: 0}
-	tCoord := coordinates{x: 0, y: 0}
-	positions := make(map[coordinates]bool)
-	positions[tCoord] = true
+	head := coordinates{x: 0, y: 0}
+	tails := make([]coordinates, 9)
+
+	part1 := make(map[coordinates]bool)
+	part1[tails[0]] = true
+
+	part2 := make(map[coordinates]bool)
+	part2[tails[8]] = true
 
 	for scanner.Scan() {
 		line := strings.Split(scanner.Text(), " ")
-		count, err := strconv.ParseInt(line[1], 10, 8)
-		if err != nil {
-			panic(err)
-		}
+		direction := line[0]
+		steps, _ := strconv.Atoi(line[1])
 
-		for i := 0; i < int(count); i++ {
-			var move int
+		for steps > 0 {
+			head.move(direction)
 
-			switch line[0] {
-			case "U", "R":
-				move = 1
-			case "D", "L":
-				move = -1
-			}
-
-			switch line[0] {
-			case "U", "D":
-				hCoord.y += move
-
-				if !tCoord.around(hCoord) {
-					tCoord.y += move
-
-					if tCoord.x != hCoord.x {
-						tCoord.x = hCoord.x
-					}
-				}
-			case "R", "L":
-				hCoord.x += move
-
-				if !tCoord.around(hCoord) {
-					tCoord.x += move
-
-					if tCoord.y != hCoord.y {
-						tCoord.y = hCoord.y
-					}
+			for ti := range tails {
+				if ti == 0 {
+					tails[ti].follow(head)
+				} else {
+					tails[ti].follow(tails[ti-1])
 				}
 			}
 
-			positions[tCoord] = true
+			part1[tails[0]] = true
+			part2[tails[8]] = true
+			steps--
 		}
 	}
 
-	fmt.Println(len(positions))
+	fmt.Println("Part 1: ", len(part1))
+	fmt.Println("Part 2: ", len(part2))
 }
 
-func (t coordinates) around(h coordinates) bool {
-	box := []int{-1, 0, 1}
+func (head *coordinates) move(direction string) {
+	var moveBy int
 
-	for _, xEdge := range box {
-		for _, yEdge := range box {
-			if t.x+xEdge == h.x && t.y+yEdge == h.y {
+	switch direction {
+	case "U", "R":
+		moveBy = 1
+	case "D", "L":
+		moveBy = -1
+	}
+
+	switch direction {
+	case "U", "D":
+		head.y += moveBy
+	case "R", "L":
+		head.x += moveBy
+	}
+}
+
+func (tail *coordinates) follow(lead coordinates) {
+	if tail.around(lead) {
+		return
+	}
+
+	if tail.x-lead.x == 2 {
+		tail.x--
+		tail.ajustY(lead)
+	} else if tail.x-lead.x == -2 {
+		tail.x++
+		tail.ajustY(lead)
+	} else if tail.y-lead.y == 2 {
+		tail.y--
+		tail.ajustX(lead)
+	} else if tail.y-lead.y == -2 {
+		tail.y++
+		tail.ajustX(lead)
+	}
+}
+
+func (tail *coordinates) around(lead coordinates) bool {
+	edges := []int{-1, 0, 1}
+
+	for _, xEdge := range edges {
+		for _, yEdge := range edges {
+			if tail.x+xEdge == lead.x && tail.y+yEdge == lead.y {
 				return true
 			}
 		}
 	}
 
 	return false
+}
+
+func (tail *coordinates) ajustX(lead coordinates) {
+	if lead.x > tail.x {
+		tail.x++
+	} else if lead.x < tail.x {
+		tail.x--
+	}
+}
+
+func (tail *coordinates) ajustY(lead coordinates) {
+	if lead.y > tail.y {
+		tail.y++
+	} else if lead.y < tail.y {
+		tail.y--
+	}
 }
