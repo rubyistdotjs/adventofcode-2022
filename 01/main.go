@@ -9,15 +9,11 @@ import (
 )
 
 func main() {
-	file, err := os.Open("./input.txt")
-	if err != nil {
-		panic(err)
-	}
-
+	file, _ := os.Open("./input.txt")
 	defer file.Close()
 
-	var calories []int32
-	var currentCalories int32
+	var calories []int
+	var currentCalories int
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -27,23 +23,20 @@ func main() {
 			calories = append(calories, currentCalories)
 			currentCalories = 0
 		} else {
-			calories, err := strconv.ParseInt(line, 10, 32)
-			if err != nil {
-				panic(err)
-			}
-
-			currentCalories += int32(calories)
+			calories, _ := strconv.Atoi(line)
+			currentCalories += calories
 		}
 	}
 
-	sort.SliceStable(calories, func(i int, j int) bool {
+	sort.Slice(calories, func(i int, j int) bool {
 		return calories[i] > calories[j]
 	})
 
-	var topThree int32
+	var part2 int
 	for _, amount := range calories[0:3] {
-		topThree += int32(amount)
+		part2 += amount
 	}
 
-	fmt.Println(topThree)
+	fmt.Println("Part1:", calories[0])
+	fmt.Println("Part2:", part2)
 }

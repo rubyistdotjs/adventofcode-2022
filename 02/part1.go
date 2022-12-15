@@ -35,14 +35,11 @@ var scores = map[string]uint8{
 }
 
 func main() {
-	file, err := os.Open("./input.txt")
-	if err != nil {
-		panic(err)
-	}
-
+	file, _ := os.Open("./input.txt")
 	defer file.Close()
 
 	var totalScore uint
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
